@@ -151,14 +151,14 @@ from cStringIO import StringIO
 from io import SEEK_CUR
 from operator import itemgetter
 
-MAGIC_NUMBER = "\xF9\xBE\xB4\xD9"
-PORT = 8333
-MIN_PROTOCOL_VERSION = 70001
-PROTOCOL_VERSION = 70015
+MAGIC_NUMBER = "\xB8\xEB\xB3\xDF"
+PORT = 9340
+MIN_PROTOCOL_VERSION = 70058
+PROTOCOL_VERSION = 70058
 FROM_SERVICES = 0
 TO_SERVICES = 1  # NODE_NETWORK
-USER_AGENT = "/bitnodes.io:0.1/"
-HEIGHT = 478000
+USER_AGENT = "/crown-crawler:0.1/"
+HEIGHT = 0 # TODO: maybe finding a way to get the blockcount
 RELAY = 0  # set to 1 to receive all txs
 
 SOCKET_BUFSIZE = 8192
@@ -959,7 +959,7 @@ class Connection(object):
 
 
 def main():
-    to_addr = ("88.99.167.175", PORT)
+    to_addr = ("92.60.46.21", PORT)
     to_services = TO_SERVICES
 
     handshake_msgs = []

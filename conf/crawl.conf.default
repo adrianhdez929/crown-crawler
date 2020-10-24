@@ -1,25 +1,21 @@
 [crawl]
 
 # Logfile
-logfile = log/crawl.f9beb4d9.log
+logfile = log/crawl.b8ebb3df.log
 
 # Network magic number
-magic_number = f9beb4d9
+magic_number = b8ebb3df
 
 # Default/fallback port number
-port = 8333
+port = 9340
 
 # Redis database number
 db = 0
 
 # List of DNS seeders to get a subset of reachable nodes
 seeders =
-    dnsseed.bitcoin.dashjr.org
-    dnsseed.bluematt.me
-    seed.bitcoin.sipa.be
-    seed.bitcoinstats.com
-    seed.bitcoin.sprovoost.nl
-    seed.bitnodes.io
+    dnsseed1.crowncoin.org
+    dnssedd2.crowncoin.org
 
 # Number of concurrent workers (greenlets)
 workers = 700
@@ -31,7 +27,7 @@ debug = False
 source_address = 0.0.0.0
 
 # Protocol version to use for outgoing version message
-protocol_version = 70015
+protocol_version = 70058
 
 # User agent (BIP 0014) to use for outgoing version message
 # -----------------------------------------------------------------------------
@@ -40,7 +36,7 @@ protocol_version = 70015
 # crawler. This is so that users will not confuse your crawler with another
 # instance that is already running and generating data for the project.
 # -----------------------------------------------------------------------------
-user_agent = /bitnodes.io:0.1/
+user_agent = /crown-crawler:0.1/
 
 # Services to use for outgoing network address message
 services = 0
@@ -141,4 +137,4 @@ onion_nodes =
 include_checked = False
 
 # Relative path to directory containing timestamp-prefixed JSON crawl files
-crawl_dir = data/crawl/f9beb4d9
+crawl_dir = data/crawl/b8ebb3df

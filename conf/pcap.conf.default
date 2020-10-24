@@ -1,10 +1,10 @@
 [pcap]
 
 # Logfile
-logfile = log/pcap.f9beb4d9.log
+logfile = log/pcap.b8ebb3df.log
 
 # Network magic number
-magic_number = f9beb4d9
+magic_number = b8ebb3df
 
 # Redis database number
 db = 0

@@ -2,13 +2,6 @@ import sys
 from protocol import *
 
 CRAWLED_NODES = []
-nodelist = lambda x: (n for n in x)
-
-def check_crawl(ip):
-    if ip not in CRAWLED_NODES:
-        CRAWLED_NODES.append(ip)
-        crawl((ip, PORT), TO_SERVICES)
-
 
 def crawl(to_addr, to_services):
     handshake_msgs = []
@@ -28,14 +21,14 @@ def crawl(to_addr, to_services):
     if len(handshake_msgs) > 0:
         services = handshake_msgs[0].get('services', 0)
 
-    check_crawl(node) for node in addr_msgs[0]['addr_list']
+    addresses = (addr for addr in addr_msgs[0]['addr_list'])
 
-    #for node in nodelist(addr_msgs[0]['addr_list']):
-    #    if node['ipv4'] in CRAWLED_NODES:
-    #        continue
-    #    else:
-    #        CRAWLED_NODES.append(node['ipv4'])
-    #        crawl((node['ipv4'], PORT), TO_SERVICES)
+    for node in addresses:
+        if node['ipv4'] in CRAWLED_NODES:
+            continue
+        else:
+            CRAWLED_NODES.append(node['ipv4'])
+            crawl((node['ipv4'], PORT), TO_SERVICES)
     print(CRAWLED_NODES)
     return 0
 

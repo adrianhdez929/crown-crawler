@@ -285,6 +285,15 @@ class Serializer(object):
             headers = kwargs['headers']
             payload = self.serialize_block_headers_payload(headers)
 
+        # Crown related messages
+        elif command == "ssc":
+            itemId = kwargs['itemId']
+            count = kwargs['count']
+            payload = self.serialize_ssc(itemId, count)
+        elif command == "mnvs":
+            hash = kwargs['hash']
+            payload = self.serialize_mnvs(hash)
+
         msg.extend([
             struct.pack("<I", len(payload)),
             sha256(sha256(payload))[:4],
@@ -330,6 +339,11 @@ class Serializer(object):
             msg.update(self.deserialize_block_payload(payload))
         elif msg['command'] == "headers":
             msg.update(self.deserialize_block_headers_payload(payload))
+        
+        # Crown related messages
+        
+        elif msg['command'] == "ssc":
+            msg.update(self.deserialize_ssc_payload(payload)) 
 
         return (msg, data.read())
 
@@ -763,7 +777,40 @@ class Serializer(object):
         elif length == 0xFF:
             length = unpack("<Q", data.read(8))
         return length
+    
+    # Crown serializators and deserializators
 
+    def serialize_ssc(self, itemId, count):
+        payload = [
+            self.serialize_int(itemId),
+            self.serialize_int(count)
+        ]
+        return ''.join(payload)
+
+    def deserialize_ssc_payload(self, data):
+        data = StringIO(data)
+        
+        itemId = self.deserialize_int(data)
+        count = self.deserialize_int(data)
+
+        return {
+            'itemId': itemId,
+            'count': count,
+        }
+
+    def serialize_mnvs(self, hash):
+        payload = [
+            unhexlify(hash)
+        ]
+
+        return ''.join(payload)
+    
+    def deserialize_mnvs(self, data):
+        hash = data.read(32)
+
+        return {
+            'proposal_hash': hash,
+        }
 
 class Connection(object):
     def __init__(self, to_addr, from_addr=("0.0.0.0", 0), **conf):
@@ -848,7 +895,8 @@ class Connection(object):
 
         # <<< [version 124 bytes] [verack 24 bytes]
         gevent.sleep(1)
-        msgs = self.get_messages(length=148, commands=["version", "verack"])
+        msgs = self.get_messages(length=276, commands=["version", "verack"])
+        print(msgs)
         if len(msgs) > 0:
             msgs[:] = sorted(msgs, key=itemgetter('command'), reverse=True)
             self.set_min_version(msgs[0])
@@ -957,13 +1005,27 @@ class Connection(object):
         msg = self.serializer.serialize_msg(command="headers", headers=headers)
         self.send(msg)
 
+    # Crown related messages
+
+    def getmnvs(self, hash):
+        msg = self.serializer.serialize_msg(command="mnvs", hash=hash)
+        self.send(msg)
+
+        gevent.sleep(5)
+
+        msgs = self.get_messages(commands=["inv", "ssc"])
+
+        return msgs
+
 
 def main():
+    #to_addr = ("188.40.184.66", PORT)
     to_addr = ("92.60.46.21", PORT)
     to_services = TO_SERVICES
 
     handshake_msgs = []
     addr_msgs = []
+    inv_msgs = []
 
     conn = Connection(to_addr, to_services=to_services)
     try:
@@ -973,8 +1035,12 @@ def main():
         print("handshake")
         handshake_msgs = conn.handshake()
 
-        print("getaddr")
-        addr_msgs = conn.getaddr()
+        #print('mnvs')
+        #inv_msgs = conn.getmnvs("0f3fb5f81707ca42c763a717034902ff9c7a04ab351a56573f5f239889adbc3b")
+        print("block")
+        inv_msgs = conn.getblocks(["0249d5f512b3b4ba2b216b5f5b8e4e1cb79d52a0c04f9f723cb5bcf48262b4a0",])
+        #print("getaddr")
+        #addr_msgs = conn.getaddr()
 
     except (ProtocolError, ConnectionError, socket.error) as err:
         print("{}: {}".format(err, to_addr))
@@ -988,7 +1054,8 @@ def main():
             print('services ({}) != {}'.format(services, to_services))
 
     print(handshake_msgs)
-    print(addr_msgs)
+    print(inv_msgs)
+    #print(addr_msgs)
 
     return 0
 

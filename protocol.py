@@ -289,10 +289,10 @@ class Serializer(object):
         elif command == "ssc":
             itemId = kwargs['itemId']
             count = kwargs['count']
-            payload = self.serialize_ssc(itemId, count)
+            payload = self.serialize_ssc_payload(itemId, count)
         elif command == "mnvs":
             hash = kwargs['hash']
-            payload = self.serialize_mnvs(hash)
+            payload = self.serialize_mnvs_payload(hash)
 
         msg.extend([
             struct.pack("<I", len(payload)),
@@ -780,7 +780,7 @@ class Serializer(object):
     
     # Crown serializators and deserializators
 
-    def serialize_ssc(self, itemId, count):
+    def serialize_ssc_payload(self, itemId, count):
         payload = [
             self.serialize_int(itemId),
             self.serialize_int(count)
@@ -790,22 +790,22 @@ class Serializer(object):
     def deserialize_ssc_payload(self, data):
         data = StringIO(data)
         
-        itemId = self.deserialize_int(data)
-        count = self.deserialize_int(data)
+        itemId = unpack("<I", data.read(4))
+        count = unpack("<I", data.read(4))
 
         return {
             'itemId': itemId,
             'count': count,
         }
 
-    def serialize_mnvs(self, hash):
+    def serialize_mnvs_payload(self, hash):
         payload = [
             unhexlify(hash)
         ]
 
         return ''.join(payload)
     
-    def deserialize_mnvs(self, data):
+    def deserialize_mnvs_payload(self, data):
         hash = data.read(32)
 
         return {
@@ -896,7 +896,7 @@ class Connection(object):
         # <<< [version 124 bytes] [verack 24 bytes]
         gevent.sleep(1)
         msgs = self.get_messages(length=276, commands=["version", "verack"])
-        print(msgs)
+        #print(msgs)
         if len(msgs) > 0:
             msgs[:] = sorted(msgs, key=itemgetter('command'), reverse=True)
             self.set_min_version(msgs[0])
@@ -1013,14 +1013,15 @@ class Connection(object):
 
         gevent.sleep(5)
 
-        msgs = self.get_messages(commands=["inv", "ssc"])
+        #msgs = self.get_messages(commands=["inv", "ssc"])
+        msgs = self.get_messages(commands=["ssc"])
 
         return msgs
 
 
 def main():
-    #to_addr = ("188.40.184.66", PORT)
-    to_addr = ("92.60.46.21", PORT)
+    to_addr = ("188.40.184.66", PORT)
+    #to_addr = ("92.60.46.21", PORT)
     to_services = TO_SERVICES
 
     handshake_msgs = []
@@ -1037,10 +1038,10 @@ def main():
 
         #print('mnvs')
         #inv_msgs = conn.getmnvs("0f3fb5f81707ca42c763a717034902ff9c7a04ab351a56573f5f239889adbc3b")
-        print("block")
-        inv_msgs = conn.getblocks(["0249d5f512b3b4ba2b216b5f5b8e4e1cb79d52a0c04f9f723cb5bcf48262b4a0",])
-        #print("getaddr")
-        #addr_msgs = conn.getaddr()
+        #print("block")
+        #inv_msgs = conn.getblocks(["0249d5f512b3b4ba2b216b5f5b8e4e1cb79d52a0c04f9f723cb5bcf48262b4a0",])
+        print("getaddr")
+        addr_msgs = conn.getaddr()
 
     except (ProtocolError, ConnectionError, socket.error) as err:
         print("{}: {}".format(err, to_addr))
@@ -1054,8 +1055,8 @@ def main():
             print('services ({}) != {}'.format(services, to_services))
 
     print(handshake_msgs)
-    print(inv_msgs)
-    #print(addr_msgs)
+    #print(inv_msgs)
+    print(addr_msgs)
 
     return 0
 

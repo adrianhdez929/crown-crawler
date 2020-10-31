@@ -551,6 +551,8 @@ def main(argv):
     print("Log: {}, press CTRL+C to terminate..".format(CONF['logfile']))
 
     global REDIS_CONN
+    global LAST_HEIGHT
+    global BLOCK_HASHES
     REDIS_CONN = new_redis_conn(db=CONF['db'])
 
     if CONF['master']:

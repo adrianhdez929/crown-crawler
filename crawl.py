@@ -119,11 +119,6 @@ def connect(redis_conn, key):
     if height:
         height = int(height)
 
-    if height > LAST_HEIGHT:
-        LAST_HEIGHT = height
-        logging.info(requests.get('https://chainz.cryptoid.info/crw/api.dws?q=getblockhash&height={}'.format(LAST_HEIGHT)))
-        
-
     proxy = None
     if address.endswith(".onion"):
         proxy = random.choice(CONF['tor_proxies'])
@@ -549,10 +544,6 @@ def main(argv):
     print("Log: {}, press CTRL+C to terminate..".format(CONF['logfile']))
 
     global REDIS_CONN
-    global LAST_HEIGHT
-    global BLOCK_HASHES
-    BLOCK_HASHES = []
-    LAST_HEIGHT = 0
     REDIS_CONN = new_redis_conn(db=CONF['db'])
 
     if CONF['master']:

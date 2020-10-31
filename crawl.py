@@ -63,8 +63,6 @@ redis.connection.socket = gevent.socket
 
 
 REDIS_CONN = None
-BLOCK_HASHES = []
-LAST_HEIGHT = 0
 CONF = {}
 
 # MaxMind databases
@@ -553,6 +551,8 @@ def main(argv):
     global REDIS_CONN
     global LAST_HEIGHT
     global BLOCK_HASHES
+    BLOCK_HASHES = []
+    LAST_HEIGHT = 0
     REDIS_CONN = new_redis_conn(db=CONF['db'])
 
     if CONF['master']:

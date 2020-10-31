@@ -123,7 +123,7 @@ def connect(redis_conn, key):
 
     if height > LAST_HEIGHT:
         LAST_HEIGHT = height
-        print(requests.get('https://chainz.cryptoid.info/crw/api.dws?q=getblockhash&height={}'.format(LAST_HEIGHT)))
+        logging.info(requests.get('https://chainz.cryptoid.info/crw/api.dws?q=getblockhash&height={}'.format(LAST_HEIGHT)))
         
 
     proxy = None

@@ -61,7 +61,10 @@ from utils import new_redis_conn, get_keys, ip_to_network
 
 redis.connection.socket = gevent.socket
 
+
 REDIS_CONN = None
+BLOCK_HASHES = []
+LAST_HEIGHT = 0
 CONF = {}
 
 # MaxMind databases
@@ -117,6 +120,11 @@ def connect(redis_conn, key):
     height = redis_conn.get('height')
     if height:
         height = int(height)
+
+    if height > LAST_HEIGHT:
+        LAST_HEIGHT = height
+        print(requests.get('https://chainz.cryptoid.info/crw/api.dws?q=getblockhash&height={}'.format(LAST_HEIGHT)))
+        
 
     proxy = None
     if address.endswith(".onion"):
@@ -490,8 +498,8 @@ def init_conf(argv):
     CONF['nodes_per_ipv6_prefix'] = conf.getint('crawl',
                                                 'nodes_per_ipv6_prefix')
 
-    #CONF['exclude_asns'] = conf.get('crawl',
-    #                                'exclude_asns').strip().split("\n")
+    CONF['exclude_asns'] = conf.get('crawl',
+                                    'exclude_asns').strip().split("\n")
 
     CONF['exclude_ipv4_networks'] = list_excluded_networks(
         conf.get('crawl', 'exclude_ipv4_networks'))

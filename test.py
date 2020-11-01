@@ -56,7 +56,7 @@ def main():
 
     if len(handshake_msgs) > 0:
         services = handshake_msgs[0].get('services', 0)
-        if services != to_services:
+        if services != TO_SERVICES:
             print('services ({}) != {}'.format(services, TO_SERVICES))
 
     print(handshake_msgs)

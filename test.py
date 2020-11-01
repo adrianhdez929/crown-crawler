@@ -59,7 +59,6 @@ def main():
         if services != TO_SERVICES:
             print('services ({}) != {}'.format(services, TO_SERVICES))
 
-    print(handshake_msgs)
     for msg in addr_msgs:
         if msg['addr_list']:
             for addr in msg['addr_list']:

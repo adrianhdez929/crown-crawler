@@ -1,4 +1,4 @@
-import asyncio
+import trollius as asyncio
 from protocol import *
 
 NODE_LIST = []

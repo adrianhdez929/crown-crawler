@@ -44,7 +44,7 @@ def main():
     handshake_msgs = []
     addr_msgs = []
 
-    conn = Connection(to_addr, to_services=to_services)
+    conn = Connection(to_addr, to_services=TO_SERVICES)
     try:
         conn.open()
         handshake_msgs = conn.handshake()
@@ -57,7 +57,7 @@ def main():
     if len(handshake_msgs) > 0:
         services = handshake_msgs[0].get('services', 0)
         if services != to_services:
-            print('services ({}) != {}'.format(services, to_services))
+            print('services ({}) != {}'.format(services, TO_SERVICES))
 
     print(handshake_msgs)
     for msg in addr_msgs:

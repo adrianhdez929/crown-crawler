@@ -35,14 +35,11 @@ async def crawl(to_addr, to_services=TO_SERVICES):
                 node = (addr['ipv4'], addr['port'])
                 if node not in NODE_LIST and await ping(addr['ipv4']):
                     NODE_LIST.append(node)
-                    asyncio.run(crawl(node))
+                    await crawl(node)
 
     return 0
 
-def main():
-    loop = asyncio.get_event_loop()
-    tasks = []
-
+async def run():
     #to_addr = ("188.40.184.66", PORT)
     to_addr = ("92.60.46.21", PORT)
     handshake_msgs = []
@@ -67,16 +64,22 @@ def main():
         if msg['addr_list']:
             for addr in msg['addr_list']:
                 node = (addr['ipv4'], addr['port'])
-                if node not in NODE_LIST and asyncio.run(ping(addr['ipv4'])):
+                if node not in NODE_LIST and await ping(addr['ipv4']):
+                    print(node)
                     NODE_LIST.append(node)
-                    tasks.append(crawl(node))
-    loop.run_until_complete(asyncio.wait(tasks))
+                    await crawl(node)
+
+def main():
+    loop = asyncio.get_event_loop()
+
+    loop.run_until_complete(asyncio.wait([run()]))
     loop.close()
+
     print(len(NODE_LIST))
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print(len(NODE_LIST))
+    #try:
+    main()
+    #except KeyboardInterrupt:
+    #    print(len(NODE_LIST))

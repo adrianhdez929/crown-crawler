@@ -79,7 +79,7 @@ def main():
 
 
 if __name__ == "__main__":
-    #try:
-    main()
-    #except KeyboardInterrupt:
-    #    print(len(NODE_LIST))
+    try:
+        main()
+    except KeyboardInterrupt:
+        print(len(NODE_LIST))

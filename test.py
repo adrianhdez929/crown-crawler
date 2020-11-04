@@ -5,7 +5,7 @@ from protocol import *
 
 NODE_LIST = []
 
-def ping(to_addr):
+async def ping(to_addr):
     FNULL = open(os.devnull, 'w')
     return subprocess.call(['ping', '-c', '1', '-W', '1', to_addr], stdout=FNULL, stderr=subprocess.STDOUT) == 0
 
@@ -13,7 +13,7 @@ async def available_nodes(addr_list):
     available_nodes = []
 
     for addr in addr_list:
-        if ping(addr['ipv4']):
+        if await ping(addr['ipv4']):
             node = (addr['ipv4'], addr['port'])
             available_nodes.append(node)
     

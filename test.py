@@ -9,16 +9,6 @@ async def ping(to_addr):
     FNULL = open(os.devnull, 'w')
     return subprocess.call(['ping', '-c', '1', '-W', '1', to_addr], stdout=FNULL, stderr=subprocess.STDOUT) == 0
 
-async def available_nodes(addr_list):
-    available_nodes = []
-
-    for addr in addr_list:
-        if await ping(addr['ipv4']):
-            node = (addr['ipv4'], addr['port'])
-            available_nodes.append(node)
-    
-    return available_nodes
-
 async def crawl(to_addr, to_services=TO_SERVICES):
     handshake_msgs = []
     addr_msgs = []
@@ -53,8 +43,8 @@ def main():
     loop = asyncio.get_event_loop()
     tasks = []
 
-    to_addr = ("188.40.184.66", PORT)
-    #to_addr = ("92.60.46.21", PORT)
+    #to_addr = ("188.40.184.66", PORT)
+    to_addr = ("92.60.46.21", PORT)
     handshake_msgs = []
     addr_msgs = []
 
@@ -75,8 +65,9 @@ def main():
 
     for msg in addr_msgs:
         if msg['addr_list']:
-            for node in asyncio.run(available_nodes(msg['addr_list'])):
-                if node not in NODE_LIST:
+            for addr in msg['addr_list']:
+                node = (addr['ipv4'], addr['port'])
+                if node not in NODE_LIST and asyncio.run(ping(addr['ipv4'])):
                     NODE_LIST.append(node)
                 #tasks.append(crawl(node))
     #loop.run_until_complete(asyncio.wait(tasks))

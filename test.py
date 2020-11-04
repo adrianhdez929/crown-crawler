@@ -5,7 +5,7 @@ from protocol import *
 
 NODE_LIST = []
 
-async def ping(to_addr):
+def ping(to_addr):
     FNULL = open(os.devnull, 'w')
     return subprocess.call(['ping', '-c', '1', '-W', '1', to_addr], stdout=FNULL, stderr=subprocess.STDOUT) == 0
 
@@ -33,7 +33,7 @@ async def crawl(to_addr, to_services=TO_SERVICES):
         if msg['addr_list']:
             for addr in msg['addr_list']:
                 node = (addr['ipv4'], addr['port'])
-                if node not in NODE_LIST and await ping(addr['ipv4']):
+                if node not in NODE_LIST and ping(addr['ipv4']):
                     NODE_LIST.append(node)
                     await crawl(node)
 
@@ -64,7 +64,7 @@ async def run():
         if msg['addr_list']:
             for addr in msg['addr_list']:
                 node = (addr['ipv4'], addr['port'])
-                if node not in NODE_LIST and await ping(addr['ipv4']):
+                if node not in NODE_LIST and ping(addr['ipv4']):
                     print(node)
                     NODE_LIST.append(node)
                     await crawl(node)

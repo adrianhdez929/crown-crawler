@@ -33,9 +33,9 @@ async def crawl(to_addr, to_services=TO_SERVICES):
         if msg['addr_list']:
             for addr in msg['addr_list']:
                 node = (addr['ipv4'], addr['port'])
-                if node not in NODE_LIST:
+                if node not in NODE_LIST and await ping(addr['ipv4']):
                     NODE_LIST.append(node)
-                await crawl(node)
+                    await crawl(node)
 
     return 0
 
@@ -69,9 +69,9 @@ def main():
                 node = (addr['ipv4'], addr['port'])
                 if node not in NODE_LIST and asyncio.run(ping(addr['ipv4'])):
                     NODE_LIST.append(node)
-                #tasks.append(crawl(node))
-    #loop.run_until_complete(asyncio.wait(tasks))
-    #loop.close()
+                    tasks.append(crawl(node))
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
     print(len(NODE_LIST))
 
 

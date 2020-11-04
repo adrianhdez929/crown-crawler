@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # protocol.py - Bitcoin protocol access for Bitnodes.
@@ -136,7 +136,7 @@ Reference: https://en.bitcoin.it/wiki/Protocol_specification
 -------------------------------------------------------------------------------
 """
 
-import gevent
+#import gevent
 import hashlib
 import random
 import socket

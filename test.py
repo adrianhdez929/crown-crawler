@@ -1,11 +1,9 @@
-import trollius as asyncio
+import asyncio
 from protocol import *
 
 NODE_LIST = []
 
-
-@asyncio.coroutine
-def crawl(to_addr, to_services=TO_SERVICES):
+async def crawl(to_addr, to_services=TO_SERVICES):
     handshake_msgs = []
     addr_msgs = []
 
@@ -65,7 +63,7 @@ def main():
                 node = (addr['ipv4'], addr['port'])
                 if node not in NODE_LIST:
                     NODE_LIST.append(node)
-                tasks.append(asyncio.async(crawl(node)))
+                tasks.append(crawl(node))
     loop.run_until_complete(asyncio.wait(tasks))
     loop.clos()
     print(len(NODE_LIST))

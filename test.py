@@ -13,7 +13,7 @@ async def crawl(to_addr, to_services=TO_SERVICES):
     handshake_msgs = []
     addr_msgs = []
 
-    conn = Connection(to_addr, to_services=to_services)
+    conn = Connection(to_addr, to_services=to_services, **{'socket_timeout': 2,})
     try:
         conn.open()
         handshake_msgs = conn.handshake()
@@ -33,7 +33,7 @@ async def crawl(to_addr, to_services=TO_SERVICES):
         if msg['addr_list']:
             for addr in msg['addr_list']:
                 node = (addr['ipv4'], addr['port'])
-                if node not in NODE_LIST and ping(addr['ipv4']):
+                if node not in NODE_LIST:# and ping(addr['ipv4']):
                     NODE_LIST.append(node)
                     await crawl(node)
 
@@ -45,7 +45,7 @@ async def run():
     handshake_msgs = []
     addr_msgs = []
 
-    conn = Connection(to_addr, to_services=TO_SERVICES)
+    conn = Connection(to_addr, to_services=TO_SERVICES, **{'socket_timeout': 2,})
     try:
         conn.open()
         handshake_msgs = conn.handshake()
@@ -64,7 +64,7 @@ async def run():
         if msg['addr_list']:
             for addr in msg['addr_list']:
                 node = (addr['ipv4'], addr['port'])
-                if node not in NODE_LIST and ping(addr['ipv4']):
+                if node not in NODE_LIST:# and ping(addr['ipv4']):
                     print(node)
                     NODE_LIST.append(node)
                     await crawl(node)

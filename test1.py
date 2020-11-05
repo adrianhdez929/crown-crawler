@@ -32,7 +32,7 @@ async def crawl(to_addr, to_services=TO_SERVICES):
         if msg['addr_list']:
             for addr in msg['addr_list']:
                 node = (addr['ipv4'], addr['port'])
-                async crawl(node)
+                await crawl(node)
 
     return 0
 

@@ -19,8 +19,9 @@ async def crawl(to_addr, to_services=TO_SERVICES):
 
     conn.close()
 
-    await Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'], handshake_msgs[0]['user_agent'].decode('utf-8'),
-            handshake_msgs[0]['height'], handshake_msgs[0]['timestamp'])
+    if len(handshake_msgs > 0):
+        await Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'], handshake_msgs[0]['user_agent'].decode('utf-8'),
+                handshake_msgs[0]['height'], handshake_msgs[0]['timestamp'])
 
     if len(handshake_msgs) > 0:
         services = handshake_msgs[0].get('services', 0)
@@ -55,8 +56,9 @@ def main():
 
     conn.close()
 
-    Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'], handshake_msgs[0]['user_agent'].decode('utf-8'), 
-        handshake_msgs[0]['height'], handshake_msgs[0]['timestamp'])
+    if len(handshake_msgs > 0):
+        Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'], handshake_msgs[0]['user_agent'].decode('utf-8'), 
+            handshake_msgs[0]['height'], handshake_msgs[0]['timestamp'])
 
     if len(handshake_msgs) > 0:
         services = handshake_msgs[0].get('services', 0)

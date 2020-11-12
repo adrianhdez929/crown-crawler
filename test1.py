@@ -1,45 +1,58 @@
 
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from models import Peer
 from protocol import *
 
 NODE_LIST = []
+VISITED_NODES=[]
 
-async def crawl(to_addr, to_services=TO_SERVICES):
+def crawl(to_addr, to_services=TO_SERVICES):
     handshake_msgs = []
     addr_msgs = []
 
-    conn = Connection(to_addr, to_services=to_services, **{'socket_timeout': 1,})
-    try:
-        conn.open()
-        handshake_msgs = conn.handshake()
-        addr_msgs = conn.getaddr()
-    except (ProtocolError, ConnectionError, socket.error) as err:
-        print("{}: {}".format(err, to_addr))
+    queue=[]
+    VISITED_NODES.append(to_addr)
+    queue.append(to_addr)
 
-    conn.close()
+    while queue:
+        nodes = []
+        to_addr = queue.pop(0)
 
-    if len(handshake_msgs) > 0:
-        await Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'], handshake_msgs[0]['user_agent'].decode('utf-8'),
-                handshake_msgs[0]['height'], handshake_msgs[0]['timestamp'])
+        conn = Connection(to_addr, to_services=to_services, **{'socket_timeout': 1, })
+        try:
+            conn.open()
+            handshake_msgs = conn.handshake()
+            addr_msgs = conn.getaddr()
+        except (ProtocolError, ConnectionError, socket.error) as err:
+            print("{}: {}".format(err, to_addr))
+        conn.close()
 
-    if len(handshake_msgs) > 0:
-        services = handshake_msgs[0].get('services', 0)
-        if services != to_services:
-            print('services ({}) != {}'.format(services, to_services))
+        if len(handshake_msgs) > 0:
+            Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'],
+                            handshake_msgs[0]['user_agent'].decode('utf-8'),
+                            handshake_msgs[0]['height'], handshake_msgs[0]['timestamp'])
 
-    print(handshake_msgs)
-    for msg in addr_msgs:
-        if msg['addr_list']:
-            for addr in msg['addr_list']:
-                node = (addr['ipv4'], addr['port'])
-                await crawl(node)
+        if len(handshake_msgs) > 0:
+            services = handshake_msgs[0].get('services', 0)
+            if services != to_services:
+                print('services ({}) != {}'.format(services, to_services))
 
-    return 0
+        # print(handshake_msgs)
+        for msg in addr_msgs:
+            if msg['addr_list']:
+                for addr in msg['addr_list']:
+                    node = (addr['ipv4'], addr['port'])
+                    nodes.append(node)
+
+        while n in nodes:
+            if(n not in VISITED_NODES):
+                VISITED_NODES.append(n)
+                queue.append(n)
 
 def main():
-    loop = asyncio.get_event_loop()
-    tasks = []
+
+    nodes = []
 
     #to_addr = ("188.40.184.66", PORT)
     to_addr = ("92.60.46.21", PORT)
@@ -57,8 +70,8 @@ def main():
     conn.close()
 
     if len(handshake_msgs) > 0:
-        Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'], handshake_msgs[0]['user_agent'].decode('utf-8'), 
-            handshake_msgs[0]['height'], handshake_msgs[0]['timestamp'])
+        asyncio.run(Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'], handshake_msgs[0]['user_agent'].decode('utf-8'), 
+            handshake_msgs[0]['height'], handshake_msgs[0]['timestamp']))
 
     if len(handshake_msgs) > 0:
         services = handshake_msgs[0].get('services', 0)
@@ -69,12 +82,12 @@ def main():
         if msg['addr_list']:
             for addr in msg['addr_list']:
                 node = (addr['ipv4'], addr['port'])
-                tasks.append(crawl(node))
-    if len(tasks) > 0:
-        loop.run_until_complete(asyncio.wait(tasks))
-        loop.close()
-    print(len(NODE_LIST))
+                nodes.append(node)
 
+    VISITED_NODES.append(to_addr)
+    with ThreadPoolExecutor() as pool:
+        for node in nodes:
+            pool.submit(crawl, node)
 
 if __name__ == "__main__":
     try:

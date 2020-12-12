@@ -86,12 +86,15 @@ def main():
                 nodes.append(node)
 
     VISITED_NODES.append(to_addr)
-    with ThreadPoolExecutor() as pool:
-        for node in nodes:
-            pool.submit(crawl, node)
+    #with ThreadPoolExecutor() as pool:
+    #    for node in nodes:
+    #       pool.submit(crawl, node)
+    
 
 if __name__ == "__main__":
     try:
         main()
+        print("Finished")
     except KeyboardInterrupt:
         print(len(VISITED_NODES))
+        

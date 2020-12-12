@@ -82,7 +82,7 @@ def main():
     for msg in addr_msgs:
         if msg['addr_list']:
             for addr in msg['addr_list']:
-                if addr['ipv4'] is '':
+                if addr['ipv4'] == '':
                     continue
                 node = (addr['ipv4'], addr['port'])
                 nodes.append(node)

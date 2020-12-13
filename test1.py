@@ -1,4 +1,3 @@
-
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from models import Peer
@@ -54,8 +53,8 @@ def main():
 
     nodes = []
 
-    #to_addr = ("188.40.184.66", PORT)
-    to_addr = ("92.60.46.21", PORT)
+    dns = socket.gethostbyname("dnsseed2.crowncoin.org")
+    to_addr = (str(dns), PORT)
     handshake_msgs = []
     addr_msgs = []
 
@@ -72,12 +71,10 @@ def main():
 
     if len(handshake_msgs) > 0:
         asyncio.run(Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'], 
-                        handshake_msgs[0]['user_agent'].decode('utf-8'), 
+                        handshake_msgs[0]['user_agent'].decode('utf-8'), handshake_msgs[0].get('services', 0),
                         handshake_msgs[0]['height'], handshake_msgs[0]['timestamp']))
-        services = handshake_msgs[0].get('services', 0)
-        if services != TO_SERVICES:
-            #pass
-            print('services ({}) != {}'.format(services, TO_SERVICES))
+
+    print(addr_msgs)
 
     for msg in addr_msgs:
         if msg['addr_list']:
@@ -88,16 +85,14 @@ def main():
                 nodes.append(node)
 
     VISITED_NODES.append(to_addr)
-    #crawl(node)
     with ThreadPoolExecutor() as pool:
         for node in nodes:
-           pool.submit(crawl, node)
-
+            pool.submit(crawl, node)
 
 if __name__ == "__main__":
     try:
         main()
-        print("Finished")
+
     except KeyboardInterrupt:
         print(len(VISITED_NODES))
         

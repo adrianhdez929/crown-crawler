@@ -24,20 +24,14 @@ def crawl(to_addr, to_services=TO_SERVICES):
             handshake_msgs = conn.handshake()
             addr_msgs = conn.getaddr()
         except (ProtocolError, ConnectionError, socket.error) as err:
-            #pass
             print("{}: {}".format(err, to_addr))
         conn.close()
 
         if len(handshake_msgs) > 0:
             asyncio.run(Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'],
-                            handshake_msgs[0]['user_agent'].decode('utf-8'),
+                            handshake_msgs[0]['user_agent'].decode('utf-8'), handshake_msgs[0].get('services', 0),
                             handshake_msgs[0]['height'], handshake_msgs[0]['timestamp']))
-            services = handshake_msgs[0].get('services', 0)
-            if services != to_services:
-                #pass
-                print('services ({}) != {}'.format(services, to_services))
-
-        # print(handshake_msgs)
+            
         for msg in addr_msgs:
             if msg['addr_list']:
                 for addr in msg['addr_list']:

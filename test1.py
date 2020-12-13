@@ -5,6 +5,7 @@ from protocol import *
 
 NODE_LIST = []
 VISITED_NODES=[]
+EMPTY_IP = 0
 
 def crawl(to_addr, to_services=TO_SERVICES):
     handshake_msgs = []
@@ -18,7 +19,7 @@ def crawl(to_addr, to_services=TO_SERVICES):
         nodes = []
         to_addr = queue.pop(0)
 
-        conn = Connection(to_addr, to_services=to_services, **{'socket_timeout': 1, })
+        conn = Connection(to_addr, to_services=to_services, **{'socket_timeout': 1.5, })
         try:
             conn.open()
             handshake_msgs = conn.handshake()
@@ -35,6 +36,9 @@ def crawl(to_addr, to_services=TO_SERVICES):
         for msg in addr_msgs:
             if msg['addr_list']:
                 for addr in msg['addr_list']:
+                    if addr['ipv4'] == '':
+                        EMPTY_IP = EMPTY_IP + 1
+                        continue
                     node = (addr['ipv4'], addr['port'])
                     nodes.append(node)
 
@@ -52,7 +56,7 @@ def main():
     handshake_msgs = []
     addr_msgs = []
 
-    conn = Connection(to_addr, to_services=TO_SERVICES, **{'socket_timeout': 1,})
+    conn = Connection(to_addr, to_services=TO_SERVICES, **{'socket_timeout': 1.5,})
     try:
         conn.open()
         handshake_msgs = conn.handshake()
@@ -72,11 +76,12 @@ def main():
         if msg['addr_list']:
             for addr in msg['addr_list']:
                 if addr['ipv4'] == '':
+                    EMPTY_IP = EMPTY_IP + 1
                     continue
                 node = (addr['ipv4'], addr['port'])
                 nodes.append(node)
 
-    VISITED_NODES.append(to_addr)
+    VISITED_NODES.append(to_addr) 
     with ThreadPoolExecutor() as pool:
         for node in nodes:
             pool.submit(crawl, node)
@@ -84,7 +89,7 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-
+        print(EMPTY_IP)
     except KeyboardInterrupt:
         print(len(VISITED_NODES))
         

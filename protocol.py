@@ -1031,7 +1031,8 @@ def main():
     addr_msgs = []
     inv_msgs = []
 
-    conn = Connection(to_addr, to_services=to_services)
+    conn = Connection(to_addr, to_services=to_services, **{'socket_timeout': 1,})
+    print(conn.socket_timeout)
     try:
         print("open")
         conn.open()

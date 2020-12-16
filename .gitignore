@@ -2,6 +2,7 @@
 *.log
 *.out
 *.pyc
+*.db
 .DS_Store
 /.idea/
 /.pytest_cache/
@@ -11,3 +12,4 @@
 geoip/*.mmdb
 geoip/*.txt
 rsync.sh
+doc.md

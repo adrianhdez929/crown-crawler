@@ -74,9 +74,6 @@ def main():
         asyncio.run(Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'], 
                         handshake_msgs[0]['user_agent'].decode('utf-8'), services,
                         handshake_msgs[0]['height'], handshake_msgs[0]['timestamp']))
-        if services != to_services:
-                #pass
-                print('services ({}) != {}'.format(services, to_services))
 
     for msg in addr_msgs:
         if msg['addr_list']:

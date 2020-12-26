@@ -53,7 +53,7 @@ def main():
 
     nodes = []
 
-    dns = socket.gethostbyname("dnsseed2.crowncoin.org")
+    dns = socket.gethostbyname("europe-01seedns.crowncoin.org")
     to_addr = (str(dns), PORT)
     handshake_msgs = []
     addr_msgs = []

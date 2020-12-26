@@ -29,10 +29,10 @@ def crawl(to_addr, to_services=TO_SERVICES):
         conn.close()
 
         if len(handshake_msgs) > 0:
-            asyncio.run(Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'],
-                            handshake_msgs[0]['user_agent'].decode('utf-8'),
-                            handshake_msgs[0]['height'], handshake_msgs[0]['timestamp']))
             services = handshake_msgs[0].get('services', 0)
+            asyncio.run(Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'],
+                            handshake_msgs[0]['user_agent'].decode('utf-8'), services,
+                            handshake_msgs[0]['height'], handshake_msgs[0]['timestamp']))
             if services != to_services:
                 #pass
                 print('services ({}) != {}'.format(services, to_services))
@@ -70,11 +70,13 @@ def main():
     conn.close()
 
     if len(handshake_msgs) > 0:
+        services = handshake_msgs[0].get('services', 0)
         asyncio.run(Peer.dump(to_addr[0], to_addr[1], handshake_msgs[0]['version'], 
-                        handshake_msgs[0]['user_agent'].decode('utf-8'), handshake_msgs[0].get('services', 0),
+                        handshake_msgs[0]['user_agent'].decode('utf-8'), services,
                         handshake_msgs[0]['height'], handshake_msgs[0]['timestamp']))
-
-    print(addr_msgs)
+        if services != to_services:
+                #pass
+                print('services ({}) != {}'.format(services, to_services))
 
     for msg in addr_msgs:
         if msg['addr_list']:
